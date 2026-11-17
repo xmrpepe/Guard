@@ -1,10 +1,13 @@
 name: Release
 
-# Pushing a tag such as v1.0.0 or v1.0.0-beta.1 builds, tests, signs and
-# publishes a GitHub release. Tags with a hyphen are marked as pre-releases.
+# Builds, tests, signs and publishes a GitHub release. Either push a tag such
+# as v1.0.0-beta.1, or run it manually ("Run workflow"): the tag is then made
+# from versionName in app/build.gradle.kts and created on the built commit.
+# Versions with a hyphen (beta, rc) are marked as pre-releases.
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,14 +24,23 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Check the tag matches versionName
+      - name: Work out the release tag
         run: |
-          TAG="${GITHUB_REF_NAME}"
           VERSION="$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)"
-          if [[ "v${VERSION}" != "${TAG}" ]]; then
-            echo "::error::Tag ${TAG} does not match versionName ${VERSION} in app/build.gradle.kts"
-            exit 1
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            TAG="${GITHUB_REF_NAME}"
+            if [[ "v${VERSION}" != "${TAG}" ]]; then
+              echo "::error::Tag ${TAG} does not match versionName ${VERSION} in app/build.gradle.kts"
+              exit 1
+            fi
+          else
+            TAG="v${VERSION}"
+            if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null; then
+              echo "::error::${TAG} already exists. Bump versionName before releasing again."
+              exit 1
+            fi
           fi
+          echo "TAG=${TAG}" >> "$GITHUB_ENV"
 
       - name: Test, lint and build
         run: ./gradlew --no-daemon :core:test :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
@@ -41,14 +53,13 @@ jobs:
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
         run: |
           mkdir -p dist
-          ./scripts/sign-release.sh app/build/outputs/apk/release/app-release-unsigned.apk "dist/RocksGuard-${GITHUB_REF_NAME}.apk"
-          (cd dist && sha256sum "RocksGuard-${GITHUB_REF_NAME}.apk" > "RocksGuard-${GITHUB_REF_NAME}.apk.sha256")
+          ./scripts/sign-release.sh app/build/outputs/apk/release/app-release-unsigned.apk "dist/RocksGuard-${TAG}.apk"
+          (cd dist && sha256sum "RocksGuard-${TAG}.apk" > "RocksGuard-${TAG}.apk.sha256")
 
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="${GITHUB_REF_NAME}"
           APK="dist/RocksGuard-${TAG}.apk"
           source "${APK}.signing"
           NOTES="docs/releases/${TAG}.md"
@@ -67,4 +78,4 @@ jobs:
           PRE=""
           [[ "$TAG" == *-* ]] && PRE="--prerelease"
           gh release create "$TAG" "$APK" "${APK}.sha256" \
-            --title "RocksGuard ${TAG#v}" --notes-file /tmp/final-notes.md $PRE --verify-tag
+            --title "RocksGuard ${TAG#v}" --notes-file /tmp/final-notes.md $PRE --target "${GITHUB_SHA}"
