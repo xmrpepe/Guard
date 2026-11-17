@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RocksGuard</string>
+    <string name="tile_label">RocksGuard</string>
+    <string name="vpn_session">RocksGuard</string>
+    <string name="channel_guard">Protection status</string>
+    <string name="channel_guard_desc">Shows that the guard is standing, with today\'s counts.</string>
+    <string name="channel_threats">Threat alerts</string>
+    <string name="channel_threats_desc">Tells you when a known malicious or phishing domain is blocked.</string>
+</resources>

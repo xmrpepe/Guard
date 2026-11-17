@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="500" height="600">
+  <title>RocksGuard mark</title>
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2F5F8"/><stop offset=".5" stop-color="#B3BEC9"/><stop offset="1" stop-color="#5E6B78"/></linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1580E0"/><stop offset="1" stop-color="#003F7D"/></linearGradient>
+    <linearGradient id="r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#C4CDD5"/></linearGradient>
+    <clipPath id="fieldClip"><path d="M17,21 L83,21 L83,58 C83,82 68,97 50,106 C32,97 17,82 17,58 Z"/></clipPath>
+  </defs>
+  <path d="M10,16 L10,8 L24,8 L24,14 L38,14 L38,8 L62,8 L62,14 L76,14 L76,8 L90,8 L90,58 C90,86 72,104 50,114 C28,104 10,86 10,58 Z" fill="url(#metal)"/>
+  <path d="M17,21 L83,21 L83,58 C83,82 68,97 50,106 C32,97 17,82 17,58 Z" fill="url(#field)"/>
+  <path d="M17,21 L83,106 M83,21 L17,106" stroke="#FFFFFF" stroke-opacity=".22" stroke-width="9" clip-path="url(#fieldClip)"/>
+  <path d="M17,21 L83,21 L83,58 C83,82 68,97 50,106 C32,97 17,82 17,58 Z" fill="none" stroke="#D5AA62" stroke-width="1.6"/>
+  <path d="M33,36 L33,84 L42,84 L42,66 L48,66 L58,84 L68,84 L56.5,64.5 C62,62 66,57 66,50 C66,42 60,36 51,36 Z M42,44 L50,44 C54.5,44 57,46.5 57,50.5 C57,54.5 54.5,58 50,58 L42,58 Z" fill="url(#r)" fill-rule="evenodd"/>
+</svg>
